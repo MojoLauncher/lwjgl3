@@ -98,9 +98,9 @@ public final class ALC {
 
         @Override
         public long getFunctionAddress(long handle, ByteBuffer functionName) {
-            long address = library.getFunctionAddress(functionName);
-            if (address == NULL && handle != NULL) {
-                address = invokePPP(handle, memAddress(functionName), alcGetProcAddress);
+            long address = invokePPP(handle, memAddress(functionName), alcGetProcAddress);
+            if (address == NULL) {
+                address = library.getFunctionAddress(functionName);
             }
             if (address == NULL && Checks.DEBUG_FUNCTIONS) {
                 apiLogMissing("ALC", functionName);
