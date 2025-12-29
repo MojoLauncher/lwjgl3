@@ -1906,8 +1906,14 @@ public final class MemoryUtil {
     public static short memGetShort(long ptr)     { return UNSAFE.getShort(null, ptr); }
     public static int memGetInt(long ptr)         { return UNSAFE.getInt(null, ptr); }
     public static long memGetLong(long ptr)       { return UNSAFE.getLong(null, ptr); }
-    public static float memGetFloat(long ptr)     { return UNSAFE.getFloat(null, ptr); }
-    public static double memGetDouble(long ptr)   { return UNSAFE.getDouble(null, ptr); }
+    public static float memGetFloat(long ptr)     { 
+        int bits = UNSAFE.getInt(null, ptr);
+        return Float.intBitsToFloat(bits);
+    }
+    public static double memGetDouble(long ptr)   { 
+        long bits = UNSAFE.getLong(null, ptr);
+        return Double.longBitsToDouble(bits);
+    }
     public static long memGetCLong(long ptr) {
         return CLONG_SIZE == 8
             ? UNSAFE.getLong(null, ptr)
@@ -1925,10 +1931,13 @@ public final class MemoryUtil {
     public static void memPutInt(long ptr, int value)       { UNSAFE.putInt(null, ptr, value); }
     public static void memPutLong(long ptr, long value)     { UNSAFE.putLong(null, ptr, value); }
     public static void memPutFloat(long ptr, float value)   {
-        System.out.println("memPutFloat addr="+Long.toHexString(ptr)+" val="+value);
-        UNSAFE.putFloat(null, ptr, value); 
+        //UNSAFE.putFloat(null, ptr, value); 
+        // ARM doesn't allow unaligned float writes, so write it as an int
+        UNSAFE.putInt(null, ptr, Float.floatToRawIntBits(value));
     }
-    public static void memPutDouble(long ptr, double value) { UNSAFE.putDouble(null, ptr, value); }
+    public static void memPutDouble(long ptr, double value) { 
+        UNSAFE.putLong(null, ptr, Double.doubleToRawLongBits(value)); 
+    }
     public static void memPutCLong(long ptr, long value) {
         if (CLONG_SIZE == 8) {
             UNSAFE.putLong(null, ptr, value);
