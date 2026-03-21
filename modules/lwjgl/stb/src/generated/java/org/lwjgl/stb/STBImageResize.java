@@ -440,4 +440,169 @@ public class STBImageResize {
         1, 1, 1, 2, 4, 2
     };
 
+
+    // LEGACY FUNCTIONS
+    
+    // --- [ stbir_resize_uint8_generic ] ---
+
+
+    private static int selectV2PixelLayout(int num_channels, int alpha_channel) {
+        if(alpha_channel == -1) return num_channels; // use backwards compatibility
+        switch(num_channels) {
+            case 2:
+                switch(alpha_channel) {
+                    case 0: return STBIR_AR;
+                    case 1: return STBIR_RA;
+                    default:
+                        throw new RuntimeException("cannot select dual channel alpha=" +alpha_channel);
+                }
+            case 4:
+                switch(alpha_channel) {
+                    case 0: return STBIR_ARGB;
+                    case 3: return STBIR_RGBA;
+                    default:
+                        throw new RuntimeException("cannot select quad channel alpha=" +alpha_channel);
+                }
+            default:
+                throw new RuntimeException("cannot select pixel layout for " + num_channels + " color channels");
+        }
+    }
+
+    private static int makePremultiplied(int pixel_layout) {
+        switch(pixel_layout) {
+            case STBIR_RGBA: return STBIR_RGBA_PM;
+            case STBIR_BGRA: return STBIR_BGRA_PM;
+            case STBIR_ARGB: return STBIR_ARGB_PM;
+            case STBIR_ABGR: return STBIR_ABGR_PM;
+            case STBIR_RA: return STBIR_RA_PM;
+            case STBIR_AR: return STBIR_AR_PM;
+            default: return pixel_layout;
+        }
+    }
+    
+    public static int nstbir_resize_uint8_generic(long input_pixels, int input_w, int input_h, int input_stride_in_bytes, long output_pixels, int output_w, int output_h, int output_stride_in_bytes, int num_channels, int alpha_channel, int flags, int edge_wrap_mode, int filter, int space, long alloc_context) {
+        num_channels = selectV2PixelLayout(num_channels, alpha_channel);
+        if((flags & (1 << 0)) != 0) num_channels = makePremultiplied(num_channels);
+        int data_type;
+        switch(space) {
+            case 0: data_type = STBIR_TYPE_UINT8; break;
+            case 1: {
+                if((flags & (1 << 1)) != 0) data_type = STBIR_TYPE_UINT8_SRGB_ALPHA;
+                else data_type = STBIR_TYPE_UINT8_SRGB;
+            }
+            default: throw new RuntimeException("unknown colorspace " + space);
+        }
+        nstbir_resize(input_pixels, input_w, input_h, input_stride_in_bytes, output_pixels, output_w, output_h, output_stride_in_bytes, num_channels, data_type, edge_wrap_mode, filter);
+        return 1;
+    }
+
+    /**
+     * Medium-complexity version of {@link #stbir_resize_uint8 resize_uint8}.
+     *
+     * @param input_pixels           the source image data
+     * @param input_w                the source image width
+     * @param input_h                the source image height
+     * @param input_stride_in_bytes  the offset between successive rows of the source image data in memory, in bytes. You can specify 0 to mean packed continuously in memory
+     * @param output_pixels          returns the scaled image data
+     * @param output_w               the resized image width
+     * @param output_h               the resized image height
+     * @param output_stride_in_bytes the offset between successive rows of the resized image data in memory, in bytes. You can specify 0 to mean packed continuously in memory
+     * @param num_channels           the number of channels in the image (e.g. RGB=3, RGBA=4)
+     * @param alpha_channel          the alpha channel index, or {@link #STBIR_ALPHA_CHANNEL_NONE ALPHA_CHANNEL_NONE} if there is no alpha channel
+     * @param flags                  the alpha channel flags. 0 will propably do the right thing if you're not sure what the flags mean. One of:<br><table><tr><td>{@link #STBIR_FLAG_ALPHA_PREMULTIPLIED FLAG_ALPHA_PREMULTIPLIED}</td><td>{@link #STBIR_FLAG_ALPHA_USES_COLORSPACE FLAG_ALPHA_USES_COLORSPACE}</td></tr></table>
+     * @param edge_wrap_mode         the edge wrap mode. One of:<br><table><tr><td>{@link #STBIR_EDGE_CLAMP EDGE_CLAMP}</td><td>{@link #STBIR_EDGE_REFLECT EDGE_REFLECT}</td><td>{@link #STBIR_EDGE_WRAP EDGE_WRAP}</td><td>{@link #STBIR_EDGE_ZERO EDGE_ZERO}</td></tr></table>
+     * @param filter                 the scale filter. One of:<br><table><tr><td>{@link #STBIR_FILTER_DEFAULT FILTER_DEFAULT}</td><td>{@link #STBIR_FILTER_BOX FILTER_BOX}</td><td>{@link #STBIR_FILTER_TRIANGLE FILTER_TRIANGLE}</td><td>{@link #STBIR_FILTER_CUBICBSPLINE FILTER_CUBICBSPLINE}</td><td>{@link #STBIR_FILTER_CATMULLROM FILTER_CATMULLROM}</td></tr><tr><td>{@link #STBIR_FILTER_MITCHELL FILTER_MITCHELL}</td></tr></table>
+     * @param space                  the image colorspace. One of:<br><table><tr><td>{@link #STBIR_COLORSPACE_LINEAR COLORSPACE_LINEAR}</td><td>{@link #STBIR_COLORSPACE_SRGB COLORSPACE_SRGB}</td></tr></table>
+     *
+     * @return 1 on success, 0 on failure
+     */
+    @NativeType("int")
+    public static boolean stbir_resize_uint8_generic(@NativeType("unsigned char const *") ByteBuffer input_pixels, int input_w, int input_h, int input_stride_in_bytes, @NativeType("unsigned char *") ByteBuffer output_pixels, int output_w, int output_h, int output_stride_in_bytes, int num_channels, int alpha_channel, int flags, @NativeType("stbir_edge") int edge_wrap_mode, @NativeType("stbir_filter") int filter, @NativeType("stbir_colorspace") int space) {
+        if (CHECKS) {
+            check(input_pixels, input_h * (input_stride_in_bytes == 0 ? input_w * num_channels : input_stride_in_bytes));
+            check(output_pixels, output_h * (output_stride_in_bytes == 0 ? output_w * num_channels : output_stride_in_bytes));
+        }
+        return nstbir_resize_uint8_generic(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddress(output_pixels), output_w, output_h, output_stride_in_bytes, num_channels, alpha_channel, flags, edge_wrap_mode, filter, space, NULL) != 0;
+    }
+
+    // --- [ stbir_resize_uint16_generic ] ---
+
+    public static int nstbir_resize_uint16_generic(long input_pixels, int input_w, int input_h, int input_stride_in_bytes, long output_pixels, int output_w, int output_h, int output_stride_in_bytes, int num_channels, int alpha_channel, int flags, int edge_wrap_mode, int filter, int space, long alloc_context) {
+        if((flags & (1 << 1)) != 0 || space == 1) throw new RuntimeException("(u16) Open a GitHub issue in https://github.com/MojoLauncher/lwjgl3/");
+        num_channels = selectV2PixelLayout(num_channels, alpha_channel);
+        if((flags & (1 << 0)) != 0) num_channels = makePremultiplied(num_channels);
+        int data_type = STBIR_TYPE_UINT16;
+        nstbir_resize(input_pixels, input_w, input_h, input_stride_in_bytes, output_pixels, output_w, output_h, output_stride_in_bytes, num_channels, data_type, edge_wrap_mode, filter);
+        return 1;
+    }
+
+    /**
+     * Short version of {@link #stbir_resize_uint8_generic resize_uint8_generic}.
+     *
+     * @param input_pixels           the source image data
+     * @param input_w                the source image width
+     * @param input_h                the source image height
+     * @param input_stride_in_bytes  the offset between successive rows of the source image data in memory, in bytes. You can specify 0 to mean packed continuously in memory
+     * @param output_pixels          returns the scaled image data
+     * @param output_w               the resized image width
+     * @param output_h               the resized image height
+     * @param output_stride_in_bytes the offset between successive rows of the resized image data in memory, in bytes. You can specify 0 to mean packed continuously in memory
+     * @param num_channels           the number of channels in the image (e.g. RGB=3, RGBA=4)
+     * @param alpha_channel          the alpha channel index, or {@link #STBIR_ALPHA_CHANNEL_NONE ALPHA_CHANNEL_NONE} if there is no alpha channel
+     * @param flags                  the alpha channel flags. 0 will propably do the right thing if you're not sure what the flags mean. One of:<br><table><tr><td>{@link #STBIR_FLAG_ALPHA_PREMULTIPLIED FLAG_ALPHA_PREMULTIPLIED}</td><td>{@link #STBIR_FLAG_ALPHA_USES_COLORSPACE FLAG_ALPHA_USES_COLORSPACE}</td></tr></table>
+     * @param edge_wrap_mode         the edge wrap mode. One of:<br><table><tr><td>{@link #STBIR_EDGE_CLAMP EDGE_CLAMP}</td><td>{@link #STBIR_EDGE_REFLECT EDGE_REFLECT}</td><td>{@link #STBIR_EDGE_WRAP EDGE_WRAP}</td><td>{@link #STBIR_EDGE_ZERO EDGE_ZERO}</td></tr></table>
+     * @param filter                 the scale filter. One of:<br><table><tr><td>{@link #STBIR_FILTER_DEFAULT FILTER_DEFAULT}</td><td>{@link #STBIR_FILTER_BOX FILTER_BOX}</td><td>{@link #STBIR_FILTER_TRIANGLE FILTER_TRIANGLE}</td><td>{@link #STBIR_FILTER_CUBICBSPLINE FILTER_CUBICBSPLINE}</td><td>{@link #STBIR_FILTER_CATMULLROM FILTER_CATMULLROM}</td></tr><tr><td>{@link #STBIR_FILTER_MITCHELL FILTER_MITCHELL}</td></tr></table>
+     * @param space                  the image colorspace. One of:<br><table><tr><td>{@link #STBIR_COLORSPACE_LINEAR COLORSPACE_LINEAR}</td><td>{@link #STBIR_COLORSPACE_SRGB COLORSPACE_SRGB}</td></tr></table>
+     *
+     * @return 1 on success, 0 on failure
+     */
+    @NativeType("int")
+    public static boolean stbir_resize_uint16_generic(@NativeType("stbir_uint16 const *") ShortBuffer input_pixels, int input_w, int input_h, int input_stride_in_bytes, @NativeType("stbir_uint16 *") ShortBuffer output_pixels, int output_w, int output_h, int output_stride_in_bytes, int num_channels, int alpha_channel, int flags, @NativeType("stbir_edge") int edge_wrap_mode, @NativeType("stbir_filter") int filter, @NativeType("stbir_colorspace") int space) {
+        if (CHECKS) {
+            check(input_pixels, input_h * (input_stride_in_bytes == 0 ? input_w * num_channels : (input_stride_in_bytes >> 1)));
+            check(output_pixels, output_h * (output_stride_in_bytes == 0 ? output_w * num_channels : (output_stride_in_bytes >> 1)));
+        }
+        return nstbir_resize_uint16_generic(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddress(output_pixels), output_w, output_h, output_stride_in_bytes, num_channels, alpha_channel, flags, edge_wrap_mode, filter, space, NULL) != 0;
+    }
+
+    // --- [ stbir_resize_float_generic ] ---
+
+    public static int nstbir_resize_float_generic(long input_pixels, int input_w, int input_h, int input_stride_in_bytes, long output_pixels, int output_w, int output_h, int output_stride_in_bytes, int num_channels, int alpha_channel, int flags, int edge_wrap_mode, int filter, int space, long alloc_context) {
+        if((flags & (1 << 1)) != 0 || space == 1) throw new RuntimeException("(float) Open a GitHub issue in https://github.com/MojoLauncher/lwjgl3/");
+        num_channels = selectV2PixelLayout(num_channels, alpha_channel);
+        if((flags & (1 << 0)) != 0) num_channels = makePremultiplied(num_channels);
+        int data_type = STBIR_TYPE_FLOAT;
+        nstbir_resize(input_pixels, input_w, input_h, input_stride_in_bytes, output_pixels, output_w, output_h, output_stride_in_bytes, num_channels, data_type, edge_wrap_mode, filter);
+        return 1;
+    }
+
+    /**
+     * Float version of {@link #stbir_resize_uint8_generic resize_uint8_generic}.
+     *
+     * @param input_pixels           the source image data
+     * @param input_w                the source image width
+     * @param input_h                the source image height
+     * @param input_stride_in_bytes  the offset between successive rows of the source image data in memory, in bytes. You can specify 0 to mean packed continuously in memory
+     * @param output_pixels          returns the scaled image data
+     * @param output_w               the resized image width
+     * @param output_h               the resized image height
+     * @param output_stride_in_bytes the offset between successive rows of the resized image data in memory, in bytes. You can specify 0 to mean packed continuously in memory
+     * @param num_channels           the number of channels in the image (e.g. RGB=3, RGBA=4)
+     * @param alpha_channel          the alpha channel index, or {@link #STBIR_ALPHA_CHANNEL_NONE ALPHA_CHANNEL_NONE} if there is no alpha channel
+     * @param flags                  the alpha channel flags. 0 will propably do the right thing if you're not sure what the flags mean. One of:<br><table><tr><td>{@link #STBIR_FLAG_ALPHA_PREMULTIPLIED FLAG_ALPHA_PREMULTIPLIED}</td><td>{@link #STBIR_FLAG_ALPHA_USES_COLORSPACE FLAG_ALPHA_USES_COLORSPACE}</td></tr></table>
+     * @param edge_wrap_mode         the edge wrap mode. One of:<br><table><tr><td>{@link #STBIR_EDGE_CLAMP EDGE_CLAMP}</td><td>{@link #STBIR_EDGE_REFLECT EDGE_REFLECT}</td><td>{@link #STBIR_EDGE_WRAP EDGE_WRAP}</td><td>{@link #STBIR_EDGE_ZERO EDGE_ZERO}</td></tr></table>
+     * @param filter                 the scale filter. One of:<br><table><tr><td>{@link #STBIR_FILTER_DEFAULT FILTER_DEFAULT}</td><td>{@link #STBIR_FILTER_BOX FILTER_BOX}</td><td>{@link #STBIR_FILTER_TRIANGLE FILTER_TRIANGLE}</td><td>{@link #STBIR_FILTER_CUBICBSPLINE FILTER_CUBICBSPLINE}</td><td>{@link #STBIR_FILTER_CATMULLROM FILTER_CATMULLROM}</td></tr><tr><td>{@link #STBIR_FILTER_MITCHELL FILTER_MITCHELL}</td></tr></table>
+     * @param space                  the image colorspace. One of:<br><table><tr><td>{@link #STBIR_COLORSPACE_LINEAR COLORSPACE_LINEAR}</td><td>{@link #STBIR_COLORSPACE_SRGB COLORSPACE_SRGB}</td></tr></table>
+     *
+     * @return 1 on success, 0 on failure
+     */
+    @NativeType("int")
+    public static boolean stbir_resize_float_generic(@NativeType("float const *") FloatBuffer input_pixels, int input_w, int input_h, int input_stride_in_bytes, @NativeType("float *") FloatBuffer output_pixels, int output_w, int output_h, int output_stride_in_bytes, int num_channels, int alpha_channel, int flags, @NativeType("stbir_edge") int edge_wrap_mode, @NativeType("stbir_filter") int filter, @NativeType("stbir_colorspace") int space) {
+        if (CHECKS) {
+            check(input_pixels, input_h * (input_stride_in_bytes == 0 ? input_w * num_channels : (input_stride_in_bytes >> 2)));
+            check(output_pixels, output_h * (output_stride_in_bytes == 0 ? output_w * num_channels : (output_stride_in_bytes >> 2)));
+        }
+        return nstbir_resize_float_generic(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddress(output_pixels), output_w, output_h, output_stride_in_bytes, num_channels, alpha_channel, flags, edge_wrap_mode, filter, space, NULL) != 0;
+    }
+
 }
