@@ -456,7 +456,6 @@ public class STBImageResize {
                     default:
                         throw new RuntimeException("cannot select dual channel alpha=" +alpha_channel);
                 }
-                break;
             case 4:
                 switch(alpha_channel) {
                     case 0: return STBIR_ARGB;
@@ -464,7 +463,6 @@ public class STBImageResize {
                     default:
                         throw new RuntimeException("cannot select quad channel alpha=" +alpha_channel);
                 }
-                break;
             default:
                 throw new RuntimeException("cannot select pixel layout for " + num_channels + " color channels");
         }
