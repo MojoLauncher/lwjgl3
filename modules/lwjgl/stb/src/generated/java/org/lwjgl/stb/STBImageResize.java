@@ -197,6 +197,44 @@ public class STBImageResize {
         return memByteBufferSafe(__result, (int)length);
     }
 
+    // --- [ stbir_resize_uint8 ] ---
+
+    public static int nstbir_resize_uint8(long input_pixels, int input_w, int input_h, int input_stride_in_bytes, long output_pixels, int output_w, int output_h, int output_stride_in_bytes, int pixel_type) {
+        return (int)nstbir_resize_uint8_linear(input_pixels, input_w, input_h, input_stride_in_bytes, output_pixels, output_w, output_h, output_stride_in_bytes, pixel_type);
+    }
+
+    @NativeType("unsigned char *")
+    public static @Nullable ByteBuffer stbir_resize_uint8(
+        @NativeType("unsigned char const *") ByteBuffer input_pixels, 
+        int input_w, int input_h, int input_stride_in_bytes, 
+        @NativeType("unsigned char *") @Nullable ByteBuffer output_pixels, 
+        int output_w, int output_h, int output_stride_in_bytes, 
+        @NativeType("stbir_pixel_layout") int pixel_type
+    ) {
+        int length = calculateBufferSize(output_w, output_h, output_stride_in_bytes, pixel_type, 1);
+        if (CHECKS) {
+            checkSafe(output_pixels, length);
+        }
+        int __result = nstbir_resize_uint8(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddressSafe(output_pixels), output_w, output_h, output_stride_in_bytes, pixel_type);
+        return memByteBufferSafe((long)__result, length);
+    }
+
+    @NativeType("unsigned char *")
+    public static @Nullable ByteBuffer stbir_resize_uint8(
+        @NativeType("unsigned char const *") ByteBuffer input_pixels, 
+        int input_w, int input_h, int input_stride_in_bytes, 
+        @NativeType("unsigned char *") @Nullable ByteBuffer output_pixels, 
+        int output_w, int output_h, int output_stride_in_bytes, 
+        @NativeType("stbir_pixel_layout") int pixel_type, 
+        long length
+    ) {
+        if (CHECKS) {
+            checkSafe(output_pixels, length);
+        }
+        int __result = nstbir_resize_uint8(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddressSafe(output_pixels), output_w, output_h, output_stride_in_bytes, pixel_type);
+        return memByteBufferSafe((long)__result, (int)length);
+    }
+
     // --- [ stbir_resize_float_linear ] ---
 
     public static native long nstbir_resize_float_linear(long input_pixels, int input_w, int input_h, int input_stride_in_bytes, long output_pixels, int output_w, int output_h, int output_stride_in_bytes, int pixel_type);
