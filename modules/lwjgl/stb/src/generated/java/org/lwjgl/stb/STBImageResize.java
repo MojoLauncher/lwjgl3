@@ -604,5 +604,63 @@ public class STBImageResize {
         }
         return nstbir_resize_float_generic(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddress(output_pixels), output_w, output_h, output_stride_in_bytes, num_channels, alpha_channel, flags, edge_wrap_mode, filter, space, NULL) != 0;
     }
+    
+    // --- [ stbir_resize_uint8 ] ---
+
+    /**
+     * @return 1 on success, 0 on failure
+     */
+    public static int nstbir_resize_uint8(long input_pixels, int input_w, int input_h, int input_stride_in_bytes, long output_pixels, int output_w, int output_h, int output_stride_in_bytes, int pixel_type) {
+        nstbir_resize_uint8_linear(input_pixels, input_w, input_h, input_stride_in_bytes, output_pixels, output_w, output_h, output_stride_in_bytes, pixel_type);
+        return 1;
+    }
+
+    /**
+     * 8-bit version of {@link #stbir_resize_uint8_generic resize_uint8_generic}.
+     *
+     * @param input_pixels           the source image data
+     * @param input_w                the source image width
+     * @param input_h                the source image height
+     * @param input_stride_in_bytes  the offset between successive rows of the source image data in memory, in bytes. You can specify 0 to mean packed continuously in memory
+     * @param output_pixels          returns the scaled image data
+     * @param output_w               the resized image width
+     * @param output_h               the resized image height
+     * @param output_stride_in_bytes the offset between successive rows of the resized image data in memory, in bytes. You can specify 0 to mean packed continuously in memory
+     * @param pixel_type             the pixel layout. One of:<br><table><tr><td>{@link #STBIR_RGB RGB}</td><td>{@link #STBIR_RGBA RGBA}</td><td>{@link #STBIR_4CHANNEL 4CHANNEL}</td><td>...</td></tr></table>
+     *
+     * @return the output buffer on success, {@code null} on failure
+     */
+    @NativeType("unsigned char *")
+    public static @Nullable ByteBuffer stbir_resize_uint8(
+        @NativeType("unsigned char const *") ByteBuffer input_pixels, 
+        int input_w, int input_h, int input_stride_in_bytes, 
+        @NativeType("unsigned char *") @Nullable ByteBuffer output_pixels, 
+        int output_w, int output_h, int output_stride_in_bytes, 
+        @NativeType("stbir_pixel_layout") int pixel_type
+    ) {
+        int length = calculateBufferSize(output_w, output_h, output_stride_in_bytes, pixel_type, 1);
+        if (CHECKS) {
+            checkSafe(output_pixels, length);
+        }
+        int result = nstbir_resize_uint8(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddressSafe(output_pixels), output_w, output_h, output_stride_in_bytes, pixel_type);
+        return result != 0 ? output_pixels : null;
+    }
+
+    /** 8-bit version of {@link #stbir_resize_uint8_generic resize_uint8_generic} with explicit length. */
+    @NativeType("unsigned char *")
+    public static @Nullable ByteBuffer stbir_resize_uint8(
+        @NativeType("unsigned char const *") ByteBuffer input_pixels, 
+        int input_w, int input_h, int input_stride_in_bytes, 
+        @NativeType("unsigned char *") @Nullable ByteBuffer output_pixels, 
+        int output_w, int output_h, int output_stride_in_bytes, 
+        @NativeType("stbir_pixel_layout") int pixel_type, 
+        long length
+    ) {
+        if (CHECKS) {
+            checkSafe(output_pixels, length);
+        }
+        int result = nstbir_resize_uint8(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddressSafe(output_pixels), output_w, output_h, output_stride_in_bytes, pixel_type);
+        return result != 0 ? output_pixels : null;
+    }
 
 }
