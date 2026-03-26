@@ -642,11 +642,7 @@ public class STBImageResize {
         if (CHECKS) {
             checkSafe(output_pixels, length);
         }
-        int result = nstbir_resize_uint8(
-            memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, 
-            memAddressSafe(output_pixels), output_w, output_h, output_stride_in_bytes, 
-            pixel_type
-        );
+        int result = nstbir_resize_uint8(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddressSafe(output_pixels), output_w, output_h, output_stride_in_bytes, pixel_type);
         return result != 0 ? output_pixels : null;
     }
 
@@ -663,11 +659,7 @@ public class STBImageResize {
         if (CHECKS) {
             checkSafe(output_pixels, length);
         }
-        int result = nstbir_resize_uint8(
-            memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, 
-            memAddressSafe(output_pixels), output_w, output_h, output_stride_in_bytes, 
-            pixel_type
-        );
+        int result = nstbir_resize_uint8(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddressSafe(output_pixels), output_w, output_h, output_stride_in_bytes, pixel_type);
         return result != 0 ? output_pixels : null;
     }
 
