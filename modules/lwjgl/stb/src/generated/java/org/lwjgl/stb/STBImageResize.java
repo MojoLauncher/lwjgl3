@@ -608,6 +608,20 @@ public class STBImageResize {
     // --- [ stbir_resize_uint8 ] ---
 
     /**
+     * Resizes an image with 8-bit unsigned integer channels.
+     *
+     * @param input_pixels           the pointer to the source image data
+     * @param input_w                the width of the source image in pixels
+     * @param input_h                the height of the source image in pixels
+     * @param input_stride_in_bytes  the distance in bytes from the start of one row to the next in the input. 
+     * Pass 0 if the data is tightly packed.
+     * @param output_pixels          the pointer to the destination buffer
+     * @param output_w               the width of the resized image
+     * @param output_h               the height of the resized image
+     * @param output_stride_in_bytes the distance in bytes from the start of one row to the next in the output. 
+     * Pass 0 if the data is tightly packed.
+     * @param pixel_type             the pixel layout/format (e.g., RGB, RGBA)
+     *
      * @return 1 on success, 0 on failure
      */
     public static int nstbir_resize_uint8(long input_pixels, int input_w, int input_h, int input_stride_in_bytes, long output_pixels, int output_w, int output_h, int output_stride_in_bytes, int pixel_type) {
@@ -616,7 +630,17 @@ public class STBImageResize {
     }
 
     /**
-     * 8-bit version of {@link #stbir_resize_uint8_generic resize_uint8_generic}.
+     * Resizes an image with 8-bit unsigned integer channels.
+     *
+     * @param input_pixels           the {@link ByteBuffer} containing source image data
+     * @param input_w                the width of the source image
+     * @param input_h                the height of the source image
+     * @param input_stride_in_bytes  the input row stride in bytes (0 for packed)
+     * @param output_pixels          the {@link ByteBuffer} to store the resized image
+     * @param output_w               the width of the output image
+     * @param output_h               the height of the output image
+     * @param output_stride_in_bytes the output row stride in bytes (0 for packed)
+     * @param pixel_type             the pixel layout ({@code stbir_pixel_layout})
      *
      * @return true on success, false on failure
      */
@@ -627,7 +651,20 @@ public class STBImageResize {
     }
 
     /**
-     * 8-bit version of {@link #stbir_resize_uint8_generic resize_uint8_generic} with explicit length.
+     * Resizes an image with 8-bit unsigned integer channels and performs an explicit length check.
+     *
+     * @param input_pixels           the {@link ByteBuffer} containing source image data
+     * @param input_w                the width of the source image
+     * @param input_h                the height of the source image
+     * @param input_stride_in_bytes  the input row stride in bytes (0 for packed)
+     * @param output_pixels          the {@link ByteBuffer} to store the resized image (can be null)
+     * @param output_w               the width of the output image
+     * @param output_h               the height of the output image
+     * @param output_stride_in_bytes the output row stride in bytes (0 for packed)
+     * @param pixel_type             the pixel layout ({@code stbir_pixel_layout})
+     * @param length                 the expected minimum capacity of the output buffer
+     *
+     * @return the {@code output_pixels} buffer on success, or {@code null} on failure
      */
     @NativeType("unsigned char *")
     public static @Nullable ByteBuffer stbir_resize_uint8(@NativeType("unsigned char const *") ByteBuffer input_pixels, int input_w, int input_h, int input_stride_in_bytes, @NativeType("unsigned char *") @Nullable ByteBuffer output_pixels, int output_w, int output_h, int output_stride_in_bytes, @NativeType("stbir_pixel_layout") int pixel_type, long length) {
