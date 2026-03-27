@@ -650,29 +650,4 @@ public class STBImageResize {
         return result != 0;
     }
 
-    /**
-     * Resizes an image with 8-bit unsigned integer channels and performs an explicit length check.
-     *
-     * @param input_pixels           the {@link ByteBuffer} containing source image data
-     * @param input_w                the width of the source image
-     * @param input_h                the height of the source image
-     * @param input_stride_in_bytes  the input row stride in bytes (0 for packed)
-     * @param output_pixels          the {@link ByteBuffer} to store the resized image (can be null)
-     * @param output_w               the width of the output image
-     * @param output_h               the height of the output image
-     * @param output_stride_in_bytes the output row stride in bytes (0 for packed)
-     * @param pixel_type             the pixel layout ({@code stbir_pixel_layout})
-     * @param length                 the expected minimum capacity of the output buffer
-     *
-     * @return the {@code output_pixels} buffer on success, or {@code null} on failure
-     */
-    @NativeType("unsigned char *")
-    public static @Nullable ByteBuffer stbir_resize_uint8(@NativeType("unsigned char const *") ByteBuffer input_pixels, int input_w, int input_h, int input_stride_in_bytes, @NativeType("unsigned char *") @Nullable ByteBuffer output_pixels, int output_w, int output_h, int output_stride_in_bytes, @NativeType("stbir_pixel_layout") int pixel_type, long length) {
-        if (CHECKS) {
-            checkSafe(output_pixels, length);
-        }
-        int result = nstbir_resize_uint8(memAddress(input_pixels), input_w, input_h, input_stride_in_bytes, memAddressSafe(output_pixels), output_w, output_h, output_stride_in_bytes, pixel_type);
-        return result != 0 ? output_pixels : null;
-    }
-
 }
