@@ -84,4 +84,8 @@ public class Sys {
 	public static String getClipboard() {
 		return GLFW.glfwGetClipboardString(GLFW.glfwGetPrimaryMonitor());
 	}
+
+	public static boolean is64Bit() {
+		return org.lwjgl.PointerBuffer.is64Bit();
+	}
 }
