@@ -78,35 +78,35 @@ public final class ContextAttribs {
     }
 
     public ContextAttribs withLayer(final int layerPlane) {
-        return null;
+        return this;
     }
 
     public ContextAttribs withDebug(final boolean debug) {
-        return null;
+        return this;
     }
 
     public ContextAttribs withForwardCompatible(final boolean forwardCompatible) {
-        return null;
+        return this;
     }
 
     public ContextAttribs withProfileCore(final boolean profileCore) {
-        return null;
+        return this;
     }
 
     public ContextAttribs withProfileCompatibility(final boolean profileCompatibility) {
-        return null;
+        return this;
     }
 
     public ContextAttribs withProfileES(final boolean profileES) {
-        return null;
+        return this;
     }
 
     public ContextAttribs withLoseContextOnReset(final boolean loseContextOnReset) {
-        return null;
+        return this;
     }
 
     public ContextAttribs withContextResetIsolation(final boolean contextResetIsolation) {
-        return null;
+        return this;
     }
 
     public String toString() {
