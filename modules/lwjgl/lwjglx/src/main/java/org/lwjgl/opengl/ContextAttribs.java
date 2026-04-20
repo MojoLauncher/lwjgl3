@@ -33,20 +33,24 @@ package org.lwjgl.opengl;
 
 public final class ContextAttribs {
 
+	private int majorVersion;
+	private int minorVersion;
+
     public ContextAttribs() {
         
     }
 
     public ContextAttribs(final int majorVersion, final int minorVersion) {
-        
+        this.majorVersion = majorVersion;
+        this.minorVersion = minorVersion;
     }
 
     public int getMajorVersion() {
-        return 0;
+        return majorVersion;
     }
 
     public int getMinorVersion() {
-        return 0;
+        return minorVersion;
     }
 
     public int getLayerPlane() {
