@@ -60,7 +60,7 @@ touch bin/classes/{generator,templates}/touch.txt bin/classes/generator/generate
 # Build LWJGL 3
 ant -version
 
-export ANTFLAGS= -Dplatform.linux=true \
+export ANTFLAGS=-Dplatform.linux=true \
   -Dbinding.assimp=false \
   -Dbinding.bgfx=false \
   -Dbinding.cuda=false \
@@ -104,9 +104,9 @@ export ANTFLAGS= -Dplatform.linux=true \
   -Dbinding.nanovg=false \
   -Dbuild.type=release/3.3.3 \
   -Djavadoc.skip=true \
+  -Dnashorn.args="--no-deprecation-warning" \
 
 yes | ant $ANTFLAGS \
-  -Dnashorn.args="--no-deprecation-warning" \
   compile compile-native
 
 yes | ant $ANTFLAGS \
