@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e
 
+export LWJGL_LIBDIR=$(dirname $(realpath $(find -type f -name "liblwjgl.so")))
+
+echo $LWJGL_LIBDIR
+
 export NDK_VERSION=r28c
 
 wget https://dl.google.com/android/repository/android-ndk-$NDK_VERSION-linux.zip
@@ -119,7 +123,7 @@ popd
 
 mkdir retrolambda-out
 
-$JAVA8_HOME/bin/java -Djava.library.path=.. -Dretrolambda.bytecodeVersion=50 -Dretrolambda.defaultMethods=true -Dretrolambda.inputDir=retrolambda-in -Dretrolambda.outputDir=retrolambda-out -Dretrolambda.classpath=retrolambda-in -jar retrolambda-2.5.7.jar
+$JAVA8_HOME/bin/java -Djava.library.path=$LWJGL_LIBDIR -Dretrolambda.bytecodeVersion=50 -Dretrolambda.defaultMethods=true -Dretrolambda.inputDir=retrolambda-in -Dretrolambda.outputDir=retrolambda-out -Dretrolambda.classpath=retrolambda-in -jar retrolambda-2.5.7.jar
 
 pushd retrolambda-out
 zip -r lwjgl-rl.jar .
