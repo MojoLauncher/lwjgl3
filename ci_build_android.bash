@@ -114,7 +114,7 @@ wget https://repo1.maven.org/maven2/net/orfjackal/retrolambda/retrolambda/2.5.7/
 
 mkdir "retrolambda-in"
 pushd "retrolambda-in"
-find ../bin/RELEASE -type f -name "*.jar" -not -name "*-natives*" | xargs -n 1 unzip
+find ../bin/RELEASE -type f -name "*.jar" -not -name "*-natives*" | xargs -n 1 unzip -o
 popd
 
 mkdir retrolambda-out
