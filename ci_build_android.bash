@@ -59,7 +59,8 @@ touch bin/classes/{generator,templates}/touch.txt bin/classes/generator/generate
 
 # Build LWJGL 3
 ant -version
-yes | ant -Dplatform.linux=true \
+
+export ANTFLAGS= -Dplatform.linux=true \
   -Dbinding.assimp=false \
   -Dbinding.bgfx=false \
   -Dbinding.cuda=false \
@@ -103,8 +104,15 @@ yes | ant -Dplatform.linux=true \
   -Dbinding.nanovg=false \
   -Dbuild.type=release/3.3.3 \
   -Djavadoc.skip=true \
+
+yes | ant $ANTFLAGS \
   -Dnashorn.args="--no-deprecation-warning" \
-  compile compile-native release
+  compile compile-native
+
+yes | ant $ANTFLAGS \
+  -Dbuild.offline=true \
+  release
+
 
 # Copy native libraries
 rm -rf bin/out; mkdir bin/out
