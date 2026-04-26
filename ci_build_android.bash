@@ -23,8 +23,8 @@ elif [ "$LWJGL_BUILD_ARCH" == "arm32" ]; then
 elif [ "$LWJGL_BUILD_ARCH" == "x86" ]; then
   export NDK_ABI=x86 NDK_TARGET=i686
   # Workaround: LWJGL 3 lacks of x86 Linux libraries
-  mkdir -p bin/libs/native/linux/x86/org/lwjgl/{freetype,glfw}
-  touch bin/libs/native/linux/x86/org/lwjgl/{freetype/libfreetype.so,glfw/libglfw.so}
+  mkdir -p bin/libs/native/linux/x86/org/lwjgl/{freetype,glfw,openal}
+  touch bin/libs/native/linux/x86/org/lwjgl/{freetype/libfreetype.so,glfw/libglfw.so,openal/libopenal.so}
 elif [ "$LWJGL_BUILD_ARCH" == "x64" ]; then
   export NDK_ABI=x86_64 NDK_TARGET=x86_64
 fi
@@ -108,7 +108,7 @@ yes | ant -Dplatform.linux=true \
 
 # Copy native libraries
 rm -rf bin/out; mkdir bin/out
-find $LWJGL_NATIVE -name 'liblwjgl*.so' -exec cp {} bin/out/ \;
+find bin/RELEASE -name '*-natives-*' -exec cp {} bin/out/ \;
 
 # Cleanup unused output jar files
 find bin/RELEASE \( -name '*-natives-*' -o -name '*-sources.jar' \) -delete
@@ -119,6 +119,7 @@ wget https://repo1.maven.org/maven2/net/orfjackal/retrolambda/retrolambda/2.5.7/
 mkdir "retrolambda-in"
 pushd "retrolambda-in"
 find ../bin/RELEASE -type f -name "*.jar" -not -name "*-natives*" | xargs -n 1 unzip -o
+rm -rf META-INF
 popd
 
 mkdir retrolambda-out
