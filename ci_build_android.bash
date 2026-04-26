@@ -35,7 +35,7 @@ if [ "$SKIP_LIBFFI" != "1" ]; then
   # Get libffi
   if [ ! -d libffi ]; then
     wget https://github.com/libffi/libffi/releases/download/v$LIBFFI_VERSION/libffi-$LIBFFI_VERSION.tar.gz
-    tar xvf libffi-$LIBFFI_VERSION.tar.gz
+    tar xvf libffi-$LIBFFI_VERSION.tar.gz > /dev/null
     mv libffi-$LIBFFI_VERSION libffi
   fi
   cd libffi
@@ -48,44 +48,6 @@ if [ "$SKIP_LIBFFI" != "1" ]; then
   # Copy libffi
   cp libffi/$NDK_TARGET-linux-android$NDK_SUFFIX/.libs/libffi.a $LWJGL_NATIVE/
 fi
-
-if [ "$SKIP_FREETYPE" != "1" ]; then
-  #!/bin/bash
-  export BUILD_FREETYPE_VERSION=2.13.2
-  wget https://downloads.sourceforge.net/project/freetype/freetype2/$BUILD_FREETYPE_VERSION/freetype-$BUILD_FREETYPE_VERSION.tar.gz
-  tar xf freetype-$BUILD_FREETYPE_VERSION.tar.gz
-  rm  freetype-$BUILD_FREETYPE_VERSION.tar.gz
-  cd freetype-$BUILD_FREETYPE_VERSION
-
-  export CC=$NDK_TARGET-linux-android${NDK_SUFFIX}21-clang
-
-  ./configure \
-    --host=$TARGET \
-    --prefix=`pwd`/build_android-$LWJGL_BUILD_ARCH \
-    --without-zlib \
-    --with-brotli=no \
-    --with-bzip2=no \
-    --with-png=no \
-    --with-harfbuzz=no \
-    --enable-static=no \
-    --enable-shared=yes 
-
-  make -j4
-  make install
-  llvm-strip ./build_android-$LWJGL_BUILD_ARCH/lib/libfreetype.so
-  
-  cd ..
-  cp   freetype-$BUILD_FREETYPE_VERSION/build_android-$LWJGL_BUILD_ARCH/lib/libfreetype.so $LWJGL_NATIVE/
-  rm -rf freetype-$BUILD_FREETYPE_VERSION
-  unset BUILD_FREETYPE_VERSION
-  unset CC
-fi
-
-# Download libraries
-POJAV_NATIVES="https://github.com/PojavLauncherTeam/PojavLauncher/raw/v3_openjdk/app_pojavlauncher/src/main/jniLibs/$NDK_ABI"
-wget -nc $POJAV_NATIVES/libopenal.so -P $LWJGL_NATIVE/openal
-wget -nc "https://github.com/PojavLauncherTeam/shaderc/releases/download/v2024.2-pojav/libshaderc-$NDK_ABI.zip"
-unzip -o libshaderc-$NDK_ABI.zip -d $LWJGL_NATIVE/shaderc
 
 # HACK: Skip compiling and running the generator to save time and keep LWJGLX functions
 mkdir -p bin/classes/{generator,templates/META-INF}
@@ -143,10 +105,24 @@ yes | ant -Dplatform.linux=true \
 # Copy native libraries
 rm -rf bin/out; mkdir bin/out
 find $LWJGL_NATIVE -name 'liblwjgl*.so' -exec cp {} bin/out/ \;
-cp $LWJGL_NATIVE/shaderc/libshaderc.so bin/out/
-if [ -e "$LWJGL_NATIVE/libfreetype.so" ]; then
-  cp $LWJGL_NATIVE/libfreetype.so bin/out/
-fi
 
 # Cleanup unused output jar files
 find bin/RELEASE \( -name '*-natives-*' -o -name '*-sources.jar' \) -delete
+
+#Run through retrolambda
+wget https://repo1.maven.org/maven2/net/orfjackal/retrolambda/retrolambda/2.5.7/retrolambda-2.5.7.jar
+
+mkdir "retrolambda-in"
+pushd "retrolambda-in"
+find ../bin/RELEASE -type f -name "*.jar" -not -name "*-natives*" | xargs -n 1 unzip
+popd
+
+mkdir retrolambda-out
+
+$JAVA8_HOME/bin/java -Dretrolambda.bytecodeVersion=50 -Dretrolambda.defaultMethods=true -Dretrolambda.inputDir=retrolambda-in -Dretrolambda.outputDir=retrolambda-out -Dretrolambda.classpath=retrolambda-in -jar retrolambda-2.5.7.jar
+
+pushd retrolambda-out
+zip -r lwjgl-rl.jar .
+popd
+
+cp retrolambda-out/lwjgl-rl.jar bin/RELEASE/

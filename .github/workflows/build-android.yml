@@ -22,6 +22,7 @@ jobs:
 
     - name: Build for Android ${{matrix.arch}}
       run: |
+        sudo apt update && sudo apt install zip unzip
         export JAVA8_HOME=$JAVA_HOME_8_${{runner.arch}}
         export LWJGL_BUILD_ARCH=${{matrix.arch}}
         bash ci_build_android.bash
