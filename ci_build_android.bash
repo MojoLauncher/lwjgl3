@@ -4,7 +4,7 @@ set -e
 export NDK_VERSION=r28c
 
 wget https://dl.google.com/android/repository/android-ndk-$NDK_VERSION-linux.zip
-unzip android-ndk-$NDK_VERSION-linux.zip
+unzip android-ndk-$NDK_VERSION-linux.zip > /dev/null
 export ANDROID_NDK_HOME=$PWD/android-ndk-$NDK_VERSION
 
 export LIBFFI_VERSION=3.4.6
@@ -119,7 +119,7 @@ popd
 
 mkdir retrolambda-out
 
-$JAVA8_HOME/bin/java -Dretrolambda.bytecodeVersion=50 -Dretrolambda.defaultMethods=true -Dretrolambda.inputDir=retrolambda-in -Dretrolambda.outputDir=retrolambda-out -Dretrolambda.classpath=retrolambda-in -jar retrolambda-2.5.7.jar
+$JAVA8_HOME/bin/java -Djava.library.path=.. -Dretrolambda.bytecodeVersion=50 -Dretrolambda.defaultMethods=true -Dretrolambda.inputDir=retrolambda-in -Dretrolambda.outputDir=retrolambda-out -Dretrolambda.classpath=retrolambda-in -jar retrolambda-2.5.7.jar
 
 pushd retrolambda-out
 zip -r lwjgl-rl.jar .
