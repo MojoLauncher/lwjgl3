@@ -62,14 +62,22 @@ ant -version
 
 export ANTFLAGS='-Dplatform.linux=true -Dbinding.assimp=false -Dbinding.bgfx=false -Dbinding.cuda=false -Dbinding.egl=false -Dbinding.fmod=false -Dbinding.harfbuzz=false -Dbinding.hwloc=false -Dbinding.jawt=false -Dbinding.jemalloc=false -Dbinding.ktx=false -Dbinding.libdivide=false -Dbinding.llvm=false -Dbinding.lmdb=false -Dbinding.lz4=false -Dbinding.meow=false -Dbinding.meshoptimizer=false -Dbinding.nfd=false -Dbinding.nuklear=false -Dbinding.odbc=false -Dbinding.opencl=false -Dbinding.openvr=false -Dbinding.openxr=false -Dbinding.opus=false -Dbinding.par=false -Dbinding.remotery=false -Dbinding.rpmalloc=false -Dbinding.spvc=false -Dbinding.sse=false -Dbinding.tinyexr=false -Dbinding.tootle=false -Dbinding.xxhash=false -Dbinding.yoga=false -Dbinding.zstd=false -Dbinding.stb=false -Dbinding.tinyfd=false -Dbinding.vma=false -Dbinding.vulkan=false -Dbinding.shaderc=false -Dbinding.freetype=false -Dbinding.msdfgen=false -Dbinding.nanovg=false -Dbuild.type=release/3.3.3 -Djavadoc.skip=true -Dnashorn.args="--no-deprecation-warning"'
 
-yes | ant $ANTFLAGS   compile compile-native
+yes | ant $ANTFLAGS compile compile-native
 
-yes | ant $ANTFLAGS   -Dbuild.offline=true   release
+yes | ant $ANTFLAGS -Dbuild.offline=true   release
 
 
 # Copy native libraries
 rm -rf bin/out; mkdir bin/out
-find bin/RELEASE -name '*-natives-*' -exec cp {} bin/out/ \;
+
+mkdir meganativejar
+pushd meganativejar
+find ../bin/RELEASE -name '*-natives-*' | xargs -n 1 unzip -o
+rm -rf META-INF
+zip -r lwjgl-meganative-$LWJGL_BUILD_ARCH.jar .
+cp lwjgl-meganative-$LWJGL_BUILD_ARCH.jar ../bin/out/
+popd
+
 
 # Cleanup unused output jar files
 find bin/RELEASE \( -name '*-natives-*' -o -name '*-sources.jar' \) -delete
