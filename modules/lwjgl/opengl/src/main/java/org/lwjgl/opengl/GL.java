@@ -358,6 +358,8 @@ public final class GL {
             throw new IllegalStateException("Core OpenGL functions could not be found. Make sure that the OpenGL library has been loaded correctly.");
         }
 
+	System.out.println("Creating OpenGL capabilities...");
+
         int errorCode = callI(GetError);
         if (errorCode != GL_NO_ERROR) {
             apiLog(String.format("An OpenGL context was in an error state before the creation of its capabilities instance. Error: 0x%X", errorCode));
@@ -388,6 +390,8 @@ public final class GL {
                 minorVersion = apiVersion.minor;
             }
         }
+        
+        System.out.println("OpenGL version "+majorVersion+"."+minorVersion);
 
         if (majorVersion < 1 || (majorVersion == 1 && minorVersion < 1)) {
             throw new IllegalStateException("OpenGL 1.1 is required.");
