@@ -470,7 +470,11 @@ public final class GL {
                 }
             }
         }
+
+        System.out.println("OpenGL extensions: " + supportedExtensions);
         apiFilterExtensions(supportedExtensions, Configuration.OPENGL_EXTENSION_FILTER);
+	System.out.println("Filtered extensions: " + supportedExtensions);
+
 
         GLCapabilities caps = new GLCapabilities(functionProvider, supportedExtensions, forwardCompatible, bufferFactory == null
             ? BufferUtils::createPointerBuffer
