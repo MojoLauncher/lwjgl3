@@ -471,9 +471,7 @@ public final class GL {
             }
         }
 
-        System.out.println("OpenGL extensions: " + supportedExtensions);
         apiFilterExtensions(supportedExtensions, Configuration.OPENGL_EXTENSION_FILTER);
-	System.out.println("Filtered extensions: " + supportedExtensions);
 
 
         GLCapabilities caps = new GLCapabilities(functionProvider, supportedExtensions, forwardCompatible, bufferFactory == null
@@ -481,6 +479,8 @@ public final class GL {
             : bufferFactory);
 
         setCapabilities(caps);
+        System.out.println("Set capabilities on thread "+Thread.currentThread().getId());
+        Thread.dumpStack();
 
         return caps;
     }
